@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slutför köp</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Slutför köp</h1>
+    <nav>
+      <a href="index.html">Hem</a>
+      <a href="cart.html">Varukorg</a>
+    </nav>
+  </header>
+  <main>
+    <section id="checkout-summary"></section>
+    <section>
+      <label for="shipping-method"><strong>Välj fraktalternativ:</strong></label><br>
+      <select id="shipping-method">
+        <option value="Postnord">Postnord</option>
+        <option value="DHL">DHL</option>
+        <option value="Budbee">Budbee</option>
+        <option value="Hämta i butik">Hämta i butik</option>
+      </select>
+    </section>
+    <button onclick="placeOrder()">Slutför beställning</button>
+  </main>
+  <footer>
+    <p>&copy; 2025 Min Webbshop</p>
+  </footer>
+  <script>
+    const checkoutSummary = document.getElementById("checkout-summary");
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+      alert("Du måste vara inloggad för att slutföra köp.");
+      window.location.href = "login.html";
+    }
+    let total = 0;
+    checkoutSummary.innerHTML = '<h2>Dina produkter</h2><ul>' +
+      cart.map(p => {
+        total += p.price;
+        return `<li>${p.name?.sv || p.name} - ${p.price} kr</li>`;
+      }).join('') + '</ul>' + `<p><strong>Totalt:</strong> ${total} kr</p>`;
+    function placeOrder() {
+      const shipping = document.getElementById("shipping-method").value;
+      const orders = JSON.parse(localStorage.getItem("orders")) || [];
+      const newOrder = {
+        username: user,
+        products: cart,
+        total: total,
+        shipping: shipping,
+        date: new Date().toLocaleString(),
+        status: "Under behandling"
+      };
+      orders.push(newOrder);
+      localStorage.setItem("orders", JSON.stringify(orders));
+      localStorage.removeItem("cart");
+      alert("Tack för din beställning!");
+      window.location.href = "thankyou.html";
+    }
+  </script>
+</body>
+</html>
